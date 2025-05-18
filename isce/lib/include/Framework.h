@@ -48,11 +48,8 @@ class Framework : public std::enable_shared_from_this<Framework> {
   json::object database();
 
   static response_t do_nothing(request_t request) {
-    
-    std::cout << "BED" << std::endl;
-
     request->shutdown();
-    return {};
+    return response();
   }
 private:
   json::object _config;

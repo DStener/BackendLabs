@@ -38,7 +38,7 @@ namespace posix_time = boost::posix_time;
 #define SQL_REFERENCES        __sql_constraint__(0b00010000)
 #define SQL_DEFAULT           __sql_constraint__(0b00100000) 
 
-// For DTO declaration, like at
+// For dto declaration, like at
 // "__sql__ name VARCHAR NOTNULL UNIQUE"
 #define INTEGER               =  __sql__(SQL_INTEGER{})
 #define SERIAL                =  __sql__(SQL_SERIAL{})

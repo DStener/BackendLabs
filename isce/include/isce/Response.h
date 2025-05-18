@@ -26,6 +26,8 @@
 
 #include <isce/fields_alloc.hpp>
 
+#include <isce/dto.h>
+
 namespace posix_time = boost::posix_time;
 
 namespace http = boost::beast::http;
@@ -52,6 +54,38 @@ public:
     json::object json {{"message", data}};
     return std::move(json_(json)); 
   }
+
+  template <typename T>
+  Response::ptr_t json(T&& data) { 
+
+    json::value value;
+
+    constexpr bool is_string = std::is_same_v<std::decay_t<T>, std::string_view> ||
+                               std::is_same_v<std::decay_t<T>, std::string> ||
+                               std::is_same_v<std::decay_t<T>, const char*>;
+
+    constexpr bool is_json = std::is_same_v<std::decay_t<T>, json::value> ||
+                             std::is_same_v<std::decay_t<T>, json::array>;
+
+    constexpr bool isdto = std::is_aggregate_v<std::decay_t<T>>;
+
+    // Convert data to json::value 
+    if constexpr (is_string) {
+      value = json::object{{"message", data}};
+    } else if constexpr (is_json) {
+      value = data;
+    } else if constexpr (isdto){
+      value = dto::json(data);
+    }
+
+    _is_file = false;
+    _body = json::serialize(value);
+    _content_type = "application/json";
+    _status = http::status::ok;
+    
+    return shared_from_this(); 
+  }
+
 
   
 

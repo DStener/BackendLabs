@@ -198,3 +198,31 @@ unsigned Request::version() {
 std::string Request::target() {
   return _request.target();
 }
+
+std::string Request::ip() {
+  return _endpoint.address().to_string();
+}
+
+std::string Request::header(std::string_view&& field) {
+
+  const auto it = _request.find(field);
+
+  if (it == _request.end()) {
+    std::cerr << std::format("Not found parametr '{}'", field);
+    return {};
+  }
+
+  return it->value();
+}
+
+std::string Request::header(http::field&& field) {
+
+  const auto it = _request.find(field);
+
+  if (it == _request.end()) {
+    std::cerr << std::format("Not found parametr");
+    return {};
+  }
+
+  return it->value();
+}

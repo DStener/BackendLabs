@@ -11,7 +11,7 @@
 #include <format>
 
 #include "config.h"
-#include <isce/DTO.h>
+#include <isce/dto.h>
 
 #include <boost/algorithm/string/join.hpp>
 
@@ -244,7 +244,7 @@ public:
     }
   }
 
-  ///////////////// DTO FUNCTIONS /////////////////////
+  ///////////////// dto FUNCTIONS /////////////////////
 
   template <typename T>
   size_t create(const T& t) {
@@ -254,9 +254,9 @@ public:
       std::vector<std::string> colums;
       std::vector<std::string> values;
 
-      DTO::for_each(t, [&](std::string_view&& name, auto& field) {
+      dto::for_each(t, [&](std::string_view&& name, auto& field) {
 
-        const auto value = DTO::to_string(field);
+        const auto value = dto::to_string(field);
 
         if (value == "''") { return; }
 
@@ -290,9 +290,9 @@ public:
 
       std::vector<std::string> assigs;
 
-      DTO::for_each(t, [&](std::string_view&& name, auto& field) {
+      dto::for_each(t, [&](std::string_view&& name, auto& field) {
 
-        const auto value = DTO::to_string(field);
+        const auto value = dto::to_string(field);
 
         if (value.empty()) { return; }
 
@@ -334,7 +334,7 @@ public:
       for (int i = 0; i < rows; ++i) {
         T t;
 
-        DTO::for_each(t, [&](std::string_view&& name, auto& field) {
+        dto::for_each(t, [&](std::string_view&& name, auto& field) {
           int index = PQfnumber(res, name.data());
           if (index == -1) { return; } // if not found
 

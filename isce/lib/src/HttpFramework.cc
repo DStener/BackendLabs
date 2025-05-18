@@ -98,33 +98,33 @@ private:
         // to prevent vulnerability to buffer attacks.
         //
         parser_.emplace(
-            std::piecewise_construct,
-            std::make_tuple(),
-            std::make_tuple(alloc_));
+          std::piecewise_construct,
+          std::make_tuple(),
+          std::make_tuple(alloc_));
         
         http::async_read(
-            socket_,
-            buffer_,
-            *parser_,
-            [this](beast::error_code ec, std::size_t)
-            {
-                if (ec)
-                    accept();
-                else {
-                    process_request(parser_->get());
-                }
-            });
+          socket_,
+          buffer_,
+          *parser_,
+          [this](beast::error_code ec, std::size_t)
+          {
+            auto remote = socket_.remote_endpoint(ec);
+              
+            if (ec) { accept(); }
+
+            process_request(parser_->get(), std::move(remote));
+          });
     }
     
-    void process_request(const http::request<request_body_t, http::basic_fields<alloc_t>>& req)
+    void process_request(const http::request<request_body_t, http::basic_fields<alloc_t>>& req,
+                         net::ip::tcp::endpoint&& endpoint)
     {
       route_t route = app()->get_route(req.target(), req.method());
 
-      Request::ptr_t request(new Request(req, route->vars));
+      Request::ptr_t request(new Request(req, route->vars, std::move(endpoint)));
       Response::ptr_t response = route->call(request);
 
       if (request->is_shutdown()) { return; }
-
 
       if(response->is_file_response()) {
 
